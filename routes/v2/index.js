@@ -1,16 +1,17 @@
-import { SwaggerRouter } from 'koa-swagger-decorator';
+import { SwaggerRouter } from 'koa-swagger-decorator'
 
-const koaRouterOpts = { prefix: '/api/v2' };
+const koaRouterOpts = { prefix: '/api/v2' }
 const swaggerRouterOpts = {
   title: 'API V2 Server',
   description: 'API DOC',
-  version: '1.0.0'
-};
-const router = new SwaggerRouter(koaRouterOpts, swaggerRouterOpts);
+  version: '1.0.0',
+  swaggerHtmlEndpoint: '/swagger'
+}
+const router = new SwaggerRouter(koaRouterOpts, swaggerRouterOpts)
 
 // swagger docs avaliable at http://localhost:3000/api/v2/swagger-html
-router.swagger();
+router.swagger()
 
-router.mapDir(__dirname);
+router.mapDir(__dirname)
 
-export default router;
+export default router

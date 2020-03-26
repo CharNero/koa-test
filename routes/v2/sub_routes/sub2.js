@@ -1,6 +1,6 @@
-import { request, summary, tags, query, body } from 'koa-swagger-decorator';
+import { request, summary, tags, query, body } from 'koa-swagger-decorator'
 
-const tag = tags(['Other']);
+const tag = tags(['Other'])
 
 export default class Other2Router {
   @request('get', '/other/what')
@@ -10,9 +10,9 @@ export default class Other2Router {
     no: { description: 'ff' }
   })
   static async getAll(ctx) {
-    const { no } = ctx.validatedQuery;
-    const other = [{ yy: 'foo' }, { yy: 'bar' }];
-    ctx.body = { other, no };
+    const { no } = ctx.validatedQuery
+    const other = [{ yy: 'foo' }, { yy: 'bar' }]
+    ctx.body = { other, no }
   }
 
   @request('POST', '/other/what')
@@ -24,7 +24,7 @@ export default class Other2Router {
     xx: { type: 'object' }
   })
   static async post(ctx) {
-    const { num, ss, xx } = ctx.validatedBody;
-    ctx.body = { num, ss, xx };
+    const { num, ss, xx } = ctx.validatedBody
+    ctx.body = { num, ss, xx }
   }
 }

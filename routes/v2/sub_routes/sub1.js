@@ -1,6 +1,6 @@
-import { request, summary, tags, body } from 'koa-swagger-decorator';
+import { request, summary, tags, body } from 'koa-swagger-decorator'
 
-const tag = tags(['Other']);
+const tag = tags(['Other'])
 
 const exampleItem = {
   type: 'object',
@@ -9,15 +9,15 @@ const exampleItem = {
     url: { type: 'string', example: 'http://www.baidu.com', required: true },
     name: { type: 'string', example: 'Bob' }
   }
-};
+}
 
 module.exports = class OtherRouter {
   @request('get', '/other')
   @summary('something in sub routes')
   @tag
   static async getAll(ctx) {
-    const other = [{ xx: 'foo' }, { xx: 'bar' }];
-    ctx.body = { other };
+    const other = [{ xx: 'foo' }, { xx: 'bar' }]
+    ctx.body = { other }
   }
 
   @request('POST', '/other')
@@ -52,6 +52,6 @@ module.exports = class OtherRouter {
     }
   })
   static async testPost(ctx) {
-    ctx.body = ctx.validatedBody;
+    ctx.body = ctx.validatedBody
   }
-};
+}

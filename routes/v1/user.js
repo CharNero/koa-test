@@ -3,75 +3,145 @@ import {
   summary,
   body,
   tags,
-  security,
-  middlewares,
+  prefix,
   path,
   description
-} from 'koa-swagger-decorator';
+} from 'koa-swagger-decorator'
+import { getToken } from '../../utils'
 
-const tag = tags(['User']);
+const tag = tags(['用户管理'])
 
 const userSchema = {
-  name: { type: 'string', required: true },
-  password: { type: 'string', required: true }
-};
+  name: { type: 'string', required: true, description: '用户名' },
+  pass: { type: 'string', required: true, description: '密码' },
+  phone: { type: 'string', required: true, description: '手机号' },
+  mail: { type: 'string', required: true, description: '邮箱' }
+}
 
-const logTime = () => async (ctx, next) => {
-  console.log(`start: ${new Date()}`);
-  await next();
-  console.log(`end: ${new Date()}`);
-};
+@prefix('/user')
 export default class UserRouter {
-  @request('POST', '/user/register')
-  @summary('register user')
-  @description('example of api')
+  @request('post', '/send')
+  @summary('发送验证码')
   @tag
-  @middlewares([logTime()])
-  @body(userSchema)
-  static async register(ctx) {
-    const { name } = ctx.validatedBody;
-    const user = { name };
-    ctx.body = { user };
+  @body({ mail: { type: 'string', required: true } })
+  static async sendMail(ctx) {
+    const { mail } = ctx.validatedBody
+    // if (!isEmail(mail)) {
+    //   ctx.fail('邮箱格式不正确')
+    // }
+    try {
+      const messageId = await ctx.sendCode({ mail })
+
+      ctx.success({
+        messageId
+      })
+    } catch (err) {
+      ctx.fail(err.message)
+    }
   }
 
-  @request('post', '/user/login')
-  @summary('user login, password is 123456')
+  @request('POST', '/register')
+  @summary('用户注册')
+  @description('example of api')
+  @tag
+  @body({
+    messageId: { type: 'string', required: true },
+    code: { type: 'string', required: true },
+    ...userSchema
+  })
+  static async register(ctx) {
+    const { name, pass, phone, mail, messageId, code } = ctx.validatedBody
+
+    const isMatched = ctx.verifyCode({
+      code,
+      messageId,
+      mail
+    })
+    if (!isMatched) {
+      ctx.fail('验证失败，请重新验证！')
+    }
+
+    try {
+      const UserModel = ctx.model('user')
+      const user = new UserModel({
+        name,
+        pass,
+        phone,
+        mail
+      })
+      await user.save()
+      ctx.success({
+        user: user.toJSON(),
+        token: getToken(user.toJSON())
+      })
+    } catch (err) {
+      ctx.fail(err.message)
+    }
+  }
+
+  @request('post', '/login')
+  @summary('用户登录')
   @tag
   @body(userSchema)
   static async login(ctx) {
-    const { name, password } = ctx.validatedBody;
-    if (password !== '123456') throw new Error('wrong password');
-    const user = { name };
-    ctx.body = { user };
+    const { phone, pass } = ctx.validatedBody
+    const UserModel = ctx.model('user')
+
+    try {
+      const user = await UserModel.findOne({ phone, pass })
+      ctx.assert(user, 500, '登录失败，请检查账号密码是否正确！')
+      ctx.success({
+        user: user.toJSON(),
+        token: getToken(user.toJSON())
+      })
+    } catch (err) {
+      ctx.fail(err.message)
+    }
   }
 
-  @request('get', '/user')
-  @summary('user list')
-  @security([{ apiKey: [] }])
+  @request('get', '')
+  @summary('用户列表')
   @tag
   static async getAll(ctx) {
-    const users = [{ name: 'foo' }, { name: 'bar' }];
-    ctx.body = { users };
+    const UserModel = ctx.model('user')
+    const users = await UserModel.find({})
+
+    if (users) {
+      ctx.success(users)
+    } else {
+      ctx.fail()
+    }
   }
 
-  @request('get', '/user/{id}')
-  @summary('get user by id')
+  @request('get', '/{id}')
+  @summary('用户信息')
   @tag
   @path({ id: { type: 'string', required: true } })
   static async getOne(ctx) {
-    const { id } = ctx.validatedParams;
-    console.log('id:', id);
-    const user = { name: 'foo' };
-    ctx.body = { user };
+    const { id } = ctx.validatedParams
+    const UserModel = ctx.model('user')
+    const user = await UserModel.findById(id)
+
+    if (!user) {
+      ctx.fail('用户不存在！')
+    } else {
+      ctx.success(user.toJSON())
+    }
   }
 
-  @request('DELETE', '/user/{id}')
-  @summary('delete user by id')
+  @request('DELETE', '/{id}')
+  @summary('用户删除')
   @tag
   @path({ id: { type: 'string', required: true } })
   static async deleteOne(ctx) {
-    const { id } = ctx.validatedParams;
-    console.log('id:', id);
-    ctx.body = { msg: 'success' };
+    const { id } = ctx.validatedParams
+    const UserModel = ctx.model('user')
+
+    try {
+      await UserModel.deleteOne({ _id: id })
+      ctx.success()
+    } catch (err) {
+      ctx.fail(err.message)
+    }
   }
 }

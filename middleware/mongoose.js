@@ -1,5 +1,5 @@
 import mongoose from '@south-paw/koa-mongoose'
-import schemas from '../schemas'
+import * as schemas from '../schemas'
 import { db } from '../config'
 
 const defOpts = {

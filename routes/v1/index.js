@@ -1,4 +1,4 @@
-import { SwaggerRouter } from 'koa-swagger-decorator';
+import { SwaggerRouter } from 'koa-swagger-decorator'
 
 const koaRouterOpts = {
   prefix: '/api/v1'
@@ -12,7 +12,7 @@ const swaggerOpts = {
   prefix: '/api/v1',
 
   // [optional] default is /swagger-html
-  swaggerHtmlEndpoint: '/swagger-html',
+  swaggerHtmlEndpoint: '/swagger',
 
   // [optional] default is /swagger-json
   swaggerJsonEndpoint: '/swagger-json',
@@ -37,10 +37,10 @@ const swaggerOpts = {
     }
   }
 }
-const router = new SwaggerRouter(koaRouterOpts, swaggerOpts);
+const router = new SwaggerRouter(koaRouterOpts, swaggerOpts)
 
 // swagger docs avaliable at http://localhost:3000/api/v1/swagger-html
-router.swagger();
+router.swagger()
 
 // mapDir will scan the input dir, and automatically call router.map to all Router Class
 router.mapDir(__dirname, {
@@ -48,6 +48,6 @@ router.mapDir(__dirname, {
   // recursive: true,
   // default: true, if true, you can call ctx.validatedBody[Query|Params] to get validated data.
   // doValidation: true,
-});
+})
 
-export default router;
+export default router

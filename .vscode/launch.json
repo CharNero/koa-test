@@ -6,12 +6,14 @@
   "configurations": [
     {
       "type": "node",
-      "request": "launch",
-      "name": "启动程序",
+      "request": "attach",
+      "name": "劫持程序",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/app.js"
+      "sourceMaps": true,
+      "restart": true,
+      "port": 9229
     }
   ]
 }

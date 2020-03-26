@@ -1,9 +1,20 @@
 import compose from 'koa-compose'
-import fs from 'fs'
+import utils from './utils'
+import cors from './cors'
+import koaJwt from './jwt'
+import sendMail from './mail'
+import errorCatch from './errorCatch'
+import koaBody from './body'
+import koaMongoose from './mongoose'
+import koaStatic from './static'
 
-let middleware
-let files = fs.readdirSync(__dirname)
-files = files.filter(file => file != 'index.js')
-
-middleware = compose(files.map(item => require('./' + item).default))
-export default middleware
+export default compose([
+  utils,
+  cors,
+  koaJwt,
+  sendMail,
+  errorCatch,
+  koaBody,
+  koaMongoose,
+  koaStatic
+])

@@ -1,6 +1,13 @@
-import { request, summary, tags, query, body, prefix } from 'koa-swagger-decorator';
+import {
+  request,
+  summary,
+  tags,
+  query,
+  body,
+  prefix
+} from 'koa-swagger-decorator'
 
-const tag = tags(['Egg']);
+const tag = tags(['Egg'])
 
 @prefix('/egg')
 export default class EggRouter {
@@ -11,8 +18,8 @@ export default class EggRouter {
     no: { type: 'string', description: 'nonono' }
   })
   async method1(ctx) {
-    const { no } = ctx.validatedQuery;
-    ctx.body = { no };
+    const { no } = ctx.validatedQuery
+    ctx.body = { no }
   }
 
   @request('post', '/method2')
@@ -27,7 +34,7 @@ export default class EggRouter {
     }
   })
   async method2(ctx) {
-    const { yes } = ctx.validatedBody;
-    ctx.body = { yes };
+    const { yes } = ctx.validatedBody
+    ctx.body = { yes }
   }
 }
